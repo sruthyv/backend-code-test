@@ -8,15 +8,25 @@ class Checkout
   end
 
   def call
-    puts "Items in cart: #{@cart_items}"
     scanned_items = []
     @cart_items.each do |cart_item|
       scanned_items << DiscountCalculator.new(cart_item: cart_item).call
     end
 
-    puts "\nItems Scanned: #{scanned_items}\n"
+    puts "\nBill:\n"
+    puts "\n----------------------\n"
+
+    scanned_items.each do |item|
+      puts "Item - #{item[:item]}"
+      puts "Quantity - #{item[:quantity]}"
+      puts "Discount - #{item[:discount]}"
+      puts "Price - #{item[:total]}"
+      puts "\n"
+    end
     total = scanned_items.collect {|item| item[:total]}.sum
-    puts "\nThe amount to be paid: #{total}"
+    puts "----------------------\n"
+    puts "\nTotal: #{total}"
+    puts "\n"
   end
 end
 
