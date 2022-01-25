@@ -1,43 +1,42 @@
+require_relative 'meta_data'
+require_relative '../services/discount_calculator.rb'
+
 class Checkout
-  attr_reader :prices
-  private :prices
-
-  def initialize(prices)
-    @prices = prices
+  def initialize(cart_items)
+    @cart_items = if ARGV.empty?
+                    cart_items
+                  else
+                    ARGV
+                  end
   end
 
-  def scan(item)
-    basket << item.to_sym
-  end
-
-  def total
-    total = 0
-
-    basket.inject(Hash.new(0)) { |items, item| items[item] += 1; items }.each do |item, count|
-      if item == :apple || item == :pear
-        if (count % 2 == 0)
-          total += prices.fetch(item) * (count / 2)
-        else
-          total += prices.fetch(item) * count
-        end
-      elsif item == :banana || item == :pineapple
-        if item == :pineapple
-          total += (prices.fetch(item) / 2)
-          total += (prices.fetch(item)) * (count - 1)
-        else
-          total += (prices.fetch(item) / 2) * count
-        end
-      else
-        total += prices.fetch(item) * count
-      end
+  def call
+    scanned_items = []
+    @cart_items.each do |cart_item|
+      scanned_items << DiscountCalculator.new(cart_item: cart_item).call
     end
 
+    puts "\nBill:\n"
+    puts "\n----------------------\n"
+
+    scanned_items.each do |item|
+      puts "Item - #{item[:item]}"
+      puts "Quantity - #{item[:quantity]}"
+      puts "Discount - #{item[:discount]}"
+      puts "Price - #{item[:total]}"
+      puts "\n"
+    end
+    total = scanned_items.collect {|item| item[:total]}.sum
+    puts "----------------------\n"
+    puts "\nTotal: #{total}"
+    puts "\n"
     total
   end
-
-  private
-
-  def basket
-    @basket ||= Array.new
-  end
 end
+
+Checkout.new([{item: :apple, quantity: 3, discount: 'HALF_PRICE_FOR_EVEN'},
+              {item: :banana, quantity: 5, discount: 'HALF_PRICE_FOR_ALL'},
+              {item: :pear, quantity: 2, discount: 'HALF_PRICE_FOR_EVEN'},
+              {item: :mango, quantity: 3, discount: 'BUY_THREE_GET_ONE'},
+              {item: :pineapple, quantity: 4, discount: 'HALF_PRICE_FOR_ONE'}]).call
+
