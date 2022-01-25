@@ -1,5 +1,5 @@
 class MetaData
-  ITEMS = {
+  PRICING_RULES = {
     apple:  1.0,
     pear: 2.0,
     pineapple: 3.0,

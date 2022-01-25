@@ -1,10 +1,13 @@
-require 'pry'
 require_relative 'meta_data'
 require_relative '../services/discount_calculator.rb'
 
 class Checkout
   def initialize(cart_items)
-    @cart_items = cart_items
+    @cart_items = if ARGV.empty?
+                    cart_items
+                  else
+                    ARGV
+                  end
   end
 
   def call
@@ -27,6 +30,7 @@ class Checkout
     puts "----------------------\n"
     puts "\nTotal: #{total}"
     puts "\n"
+    total
   end
 end
 

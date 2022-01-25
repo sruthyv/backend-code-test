@@ -1,6 +1,6 @@
 class DiscountCalculator
   def initialize(cart_item:)
-    @price = ::MetaData::ITEMS.fetch(cart_item[:item])
+    @price = ::MetaData::PRICING_RULES.fetch(cart_item[:item])
     @quantity = cart_item[:quantity]
     @cart_item = cart_item[:item]
     @discount = cart_item[:discount]
@@ -8,7 +8,6 @@ class DiscountCalculator
   end
   
   def call
-    total = 0.0
     case @discount
     when 'HALF_PRICE_FOR_EVEN'
       scan_price(buy_even_at_half_price)
@@ -46,7 +45,6 @@ class DiscountCalculator
 
   def buy_three_get_one
     return 0.0 unless @cart_item == :mango
-    return @price * @quantity unless (@quantity % 3 == 0)
 
     @cart_item_hash[:quantity] = ((@quantity / 3) + @quantity) # Increare Item quantity
     @price * ( @quantity - (@quantity / 3))
